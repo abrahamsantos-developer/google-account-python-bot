@@ -1,4 +1,5 @@
 import argparse
+import time
 from playwright.sync_api import sync_playwright
 
 def run(playwright, first_name, last_name, birth_month, birth_day, birth_year, gender):
@@ -34,17 +35,36 @@ def run(playwright, first_name, last_name, birth_month, birth_day, birth_year, g
         page.wait_for_selector("#year")
         page.fill("#year", birth_year)
 
+        # Normalizar género
+        if gender.lower() in ["masculino", "hombre"]:
+            gender_normalized = "Hombre"
+        elif gender.lower() in ["femenino", "mujer"]:
+            gender_normalized = "Mujer"
+        else:
+            raise ValueError("Género no reconocido. Usa 'Masculino/Hombre' o 'Femenino/Mujer'.")
+
         # Seleccionar género
+        page.wait_for_selector("#gender")
         page.click("#gender")
-        page.select_option("#gender", gender)
+        page.select_option("#gender", label=gender_normalized)
 
         # Clic en el botón de siguiente en la segunda pantalla
-        page.wait_for_selector("#personalDetailsNext")
-        page.click("#personalDetailsNext")
+        #page.wait_for_selector("button[jsname='V67aGc']")
+        #page.click("button[jsname='V67aGc']")
+
+        # Clic en el botón de siguiente en la segunda pantalla usando XPath
+        page.wait_for_selector("//span[text()='Siguiente']/ancestor::button")
+        page.click("//span[text()='Siguiente']/ancestor::button")
+
+        # Espera adicional para verificar que la acción se complete
+        time.sleep(5)
 
     except Exception as e:
         print(f"Error: {e}")
         page.screenshot(path="error_screenshot.png")
+
+        # Espera adicional para depuración antes de cerrar el navegador
+    time.sleep(10)
     
     # Aquí podrías agregar más lógica para manejar el flujo completo del registro
 
@@ -57,7 +77,7 @@ if __name__ == "__main__":
     parser.add_argument("--birth_month", required=True, help="Mes de nacimiento (Enero, Febrero, etc.)")
     parser.add_argument("--birth_day", required=True, help="Día de nacimiento")
     parser.add_argument("--birth_year", required=True, help="Año de nacimiento")
-    parser.add_argument("--gender", required=True, help="Género (Masculino, Femenino)")
+    parser.add_argument("--gender", required=True, choices=["Masculino", "Hombre", "Femenino", "Mujer"], help="Género (Masculino/Hombre, Femenino/Mujer)")
 
     args = parser.parse_args()
 
