@@ -21,27 +21,31 @@ def run(playwright, first_name, last_name, birth_month, birth_day, birth_year, g
     page.click("button[jsname='LgbsSe']")
 
     # Esperar a que la segunda pantalla cargue
-    page.wait_for_selector("select[name='month']")
+    try:
+        page.wait_for_selector("#month", timeout=60000)
+        # Seleccionar mes de nacimiento
+        page.click("#month")
+        page.select_option("#month", birth_month)
+        
+        # Llenar día y año de nacimiento
+        page.wait_for_selector("#day")
+        page.fill("#day", birth_day)
+        
+        page.wait_for_selector("#year")
+        page.fill("#year", birth_year)
 
-    # Seleccionar mes de nacimiento
-    page.click("select[name='month']")
-    page.select_option("select[name='month']", birth_month)
+        # Seleccionar género
+        page.click("#gender")
+        page.select_option("#gender", gender)
+
+        # Clic en el botón de siguiente en la segunda pantalla
+        page.wait_for_selector("#personalDetailsNext")
+        page.click("#personalDetailsNext")
+
+    except Exception as e:
+        print(f"Error: {e}")
+        page.screenshot(path="error_screenshot.png")
     
-    # Llenar día y año de nacimiento
-    page.wait_for_selector("input[name='day']")
-    page.fill("input[name='day']", birth_day)
-    
-    page.wait_for_selector("input[name='year']")
-    page.fill("input[name='year']", birth_year)
-
-    # Seleccionar género
-    page.click("select[name='gender']")
-    page.select_option("select[name='gender']", gender)
-
-    # Clic en el botón de siguiente en la segunda pantalla
-    page.wait_for_selector("button[jsname='LgbsSe']")
-    page.click("button[jsname='LgbsSe']")
-
     # Aquí podrías agregar más lógica para manejar el flujo completo del registro
 
     browser.close()
