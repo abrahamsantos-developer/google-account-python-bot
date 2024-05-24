@@ -48,10 +48,6 @@ def run(playwright, first_name, last_name, birth_month, birth_day, birth_year, g
         page.click("#gender")
         page.select_option("#gender", label=gender_normalized)
 
-        # Clic en el botón de siguiente en la segunda pantalla
-        #page.wait_for_selector("button[jsname='V67aGc']")
-        #page.click("button[jsname='V67aGc']")
-
         # Clic en el botón de siguiente en la segunda pantalla usando XPath
         page.wait_for_selector("//span[text()='Siguiente']/ancestor::button")
         page.click("//span[text()='Siguiente']/ancestor::button")
